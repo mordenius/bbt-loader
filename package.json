@@ -1,6 +1,6 @@
 {
   "name": "bbt-loader",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/mordenius/bbt-loader#readme",
   "dependencies": {
-    "redux-store-controller": "^1.0.3"
+    "redux-store-controller": "^1.0.4"
   },
   "devDependencies": {
     "babel-cli": "^6.23.0",
