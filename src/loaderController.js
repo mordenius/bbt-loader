@@ -1,73 +1,100 @@
-import LoaderStore from './loaderStore';
+import forEach from "lodash/forEach";
+import assign from "lodash/assign";
+import LoaderStore from "./loaderStore";
 
 class LoaderController {
-	constructor(options){
-		this.loaderStore = new LoaderStore({initialState: options.loaderList});
+	constructor(options) {
+		this.loaderStore = new LoaderStore({ initialState: options.loaderList });
 
 		this.state = this.loaderStore.getStore;
 
 		this.unsubscribe = this.loaderStore.subscribe(() => {
 			this.state = this.loaderStore.getStore;
 			this.changeHandler();
-		})
+		});
 
 		this.partTypeHandler();
 	}
 
-	setCurrentPart(){
-		this.state.currentPart = this.state.loaderList[this.state.step].parts[this.state.part];
+	setCurrentPart() {
+		this.state.currentPart = this.state.loaderList[this.state.step].parts[
+			this.state.part
+		];
 	}
 
-	changeHandler(){
-		if(null != this.state.err) return this.errorHandler();
-		if(true == this.state.done) return this.loadSuccess();
-		this.partTypeHandler();
+	changeHandler() {
+		if (this.state.err != null) this.errorHandler();
+		else if (this.state.done === true) LoaderController.loadSuccess();
+		else this.partTypeHandler();
 	}
 
-	partTypeHandler(){
+	partTypeHandler() {
 		this.setCurrentPart();
 
-		switch(this.state.currentPart.type){
-			case 'class': this.classHandler(); this.loaderStore.partDone(); break;
-			case 'init': this.initHandler(); break;
-			case 'data': this.dataHandler(); this.loaderStore.partDone(); break;
+		switch (this.state.currentPart.type) {
+			case "class":
+				this.classHandler();
+				this.loaderStore.partDone();
+				break;
+			case "init":
+				this.initHandler();
+				break;
+			case "data":
+				this.dataHandler();
+				this.loaderStore.partDone();
+				break;
+			default:
+				break;
 		}
 	}
 
-	dataHandler(){
+	dataHandler() {
 		this[this.state.currentPart.name] = this.state.currentPart.controller;
 	}
-	
+
 	// Создание экземпляра класса
-	classHandler(){
-		let params = this.getClassParams();
-		this[this.state.currentPart.name] = new this.state.currentPart.controller(params);
+	classHandler() {
+		const params = this.getClassParams();
+		this[this.state.currentPart.name] = new this.state.currentPart.controller( //eslint-disable-line
+			params
+		);
 	}
 
 	// Создание экземпляра класса с инициализацией
-	initHandler(){
+	initHandler() {
 		this.classHandler();
 
-		this[this.state.currentPart.name].init()
+		this[this.state.currentPart.name]
+			.init()
 			.then(() => this.loaderStore.partDone())
-			.catch((err) => this.loaderStore.setError(err))
+			.catch(err => this.loaderStore.setError(err));
 	}
 
-	getClassParams(){
-		if('undefined' == typeof this.state.currentPart.params || 1 > this.state.currentPart.params.length) return false;
+	getClassParams() {
+		if (
+			typeof this.state.currentPart.params === "undefined" ||
+			this.state.currentPart.params.length < 1
+		)
+			return false;
 
-		let params = {};
-		this.state.currentPart.params.map((param) => params[param] = this[param])
+		const params = {};
+		forEach(this.state.currentPart.params, param => {
+			if (typeof param === "string") {
+				if (param === "selfName")
+					assign(params, { name: this.state.currentPart.name });
+				else params[param] = this[param];
+			} else if (typeof param === "object") assign(params, param);
+		});
 
 		return params;
 	}
 
-	errorHandler(){
-		console.log(this.state.err);
+	errorHandler() {
+		global.console.error(`BBT-Loader: ${this.state.err}`);
 	}
 
-	loadSuccess(){
-		console.log('load success');
+	static loadSuccess() {
+		global.console.log("BBT-Loader: load success!");
 	}
 }
 

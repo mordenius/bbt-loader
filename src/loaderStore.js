@@ -16,40 +16,36 @@ class LoaderStore extends StoreClass {
 	update(state, action) {
 		switch (action.type) {
 			case "PART":
-				state.loaderList[state.step].parts[state.part].isLoaded = true;
-				state.part++;
-
-				let stepLoadedParts = state.loaderList[state.step].parts.filter(
-					el => el.isLoaded
-				);
-				if (
-					state.loaderList[state.step].parts.length == stepLoadedParts.length
-				) {
-					state.loaderList[state.step].isLoaded = true;
-					state.step++;
-					state.part = 0;
-				}
-
-				let stepLoaded = state.loaderList.filter(el => el.isLoaded);
-				if (state.loaderList.length == stepLoaded.length) state.done = true;
-				break;
 			case "HANDLED_ERROR":
-				state.err = action.err;
-				break;
+				return action.data;
 			default:
 				return state;
-				break;
 		}
-
-		return state;
 	}
 
 	partDone() {
-		this._store.dispatch({ type: "PART" });
+		const state = this.getStore;
+		state.loaderList[state.step].parts[state.part].isLoaded = true;
+		state.part += 1;
+
+		const stepLoadedParts = state.loaderList[state.step].parts.filter(
+			el => el.isLoaded
+		);
+		if (state.loaderList[state.step].parts.length === stepLoadedParts.length) {
+			state.loaderList[state.step].isLoaded = true;
+			state.step += 1;
+			state.part = 0;
+		}
+
+		const stepLoaded = state.loaderList.filter(el => el.isLoaded);
+		if (state.loaderList.length === stepLoaded.length) state.done = true;
+		this._store.dispatch({ type: "PART", data: state });
 	}
 
-	setError(err) {
-		this._store.dispatch({ type: "HANDLED_ERROR", err: err });
+	setError(error) {
+		const state = this.getStore;
+		state.err = error;
+		this._store.dispatch({ type: "HANDLED_ERROR", data: state });
 	}
 }
 

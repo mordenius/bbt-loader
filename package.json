@@ -1,6 +1,6 @@
 {
   "name": "bbt-loader",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -28,6 +28,7 @@
     "babel-core": "^6.23.1",
     "babel-plugin-transform-export-extensions": "^6.22.0",
     "babel-preset-es2015": "^6.22.0",
+    "lodash": "^4.17.4",
     "redux-store-controller": "^1.1.1"
   },
   "devDependencies": {
