@@ -1,4 +1,7 @@
 {
-  "presets" : ["es2015"],
-  "plugins": ["transform-export-extensions"]
+  "presets" : [
+    ["bbt", {
+      "target": { "browser": true, "node": true }
+    }]
+  ]
 }

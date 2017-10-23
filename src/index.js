@@ -1,3 +1,3 @@
-import LoaderController from './loaderController';
+import LoaderController from "./loaderController";
 
 export default LoaderController;
